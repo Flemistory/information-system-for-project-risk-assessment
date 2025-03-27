@@ -105,6 +105,25 @@ input, select {
     border-radius: 4px;
 }
 
+.export-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.export-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.export-btn.excel { background-color: #28a745; }
+.export-btn.pdf { background-color: #dc3545; }
+
 @media (max-width: 768px) {
     .project-card { padding: 15px; }
     .modal-content { width: 90%; }

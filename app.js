@@ -113,7 +113,11 @@ function viewProject(projectId) {
     const modalBody = `
         <h3>${project.name}</h3>
         <button onclick="openModal('risk', '${projectId}')">Добавить риск</button>
-        <table>
+        <div class="export-buttons">
+            <button class="export-btn excel" onclick="exportToExcel('${projectId}')">Экспорт в Excel</button>
+            <button class="export-btn pdf" onclick="exportToPDF('${projectId}')">Экспорт в PDF</button>
+        </div>
+        <table id="project-table-${projectId}">
             <thead>
                 <tr>
                     <th>Риск</th>
@@ -179,7 +183,6 @@ function editRisk(projectId, riskId) {
     document.getElementById('probability').value = risk.probability;
     document.getElementById('impact').value = risk.impact;
     
-    // Переопределяем сохранение для редактирования
     document.querySelector('#modal button').onclick = () => {
         risk.name = document.getElementById('riskName').value;
         risk.probability = parseInt(document.getElementById('probability').value);
@@ -195,6 +198,43 @@ function getRiskLevel(score) {
     if (score <= 50) return 'low';
     if (score <= 150) return 'medium';
     return 'high';
+}
+
+// Экспорт в Excel
+function exportToExcel(projectId) {
+    const project = projects.find(p => p.id === projectId);
+    const risks = project.risks.map(risk => ({
+        'Название риска': risk.name,
+        'Вероятность (%)': risk.probability,
+        'Воздействие': risk.impact,
+        'Оценка риска': risk.score
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(risks);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Риски');
+    XLSX.writeFile(wb, `${project.name}.xlsx`);
+}
+
+// Экспорт в PDF
+function exportToPDF(projectId) {
+    const project = projects.find(p => p.id === projectId);
+    const table = document.getElementById(`project-table-${projectId}`);
+    
+    html2canvas(table).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jspdf.jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
+        
+        const imgWidth = pdf.internal.pageSize.getWidth();
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save(`${project.name}.pdf`);
+    });
 }
 
 // Инициализация
