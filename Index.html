@@ -7,9 +7,27 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <!-- Модальное окно авторизации/регистрации -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <span onclick="closeAuthModal()" class="close">&times;</span>
+            <h2 id="auth-title">Авторизация</h2>
+            <div id="auth-body">
+                <input type="text" id="auth-login" placeholder="Логин" required>
+                <input type="password" id="auth-password" placeholder="Пароль" required>
+                <button id="auth-button" onclick="handleAuth()">Войти</button>
+                <button id="switch-auth" onclick="toggleAuthMode()">Регистрация</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Главная страница -->
+    <div id="main-page" style="display: none;">
     <h1>Управление проектами</h1>
     <button onclick="openModal('project')">Добавить проект</button>
+    <button onclick="logout()">Выход</button> <!-- Кнопка выхода -->
     <div id="projects"></div>
+</div>
 
     <!-- Модальные окна -->
     <div id="modal" class="modal">
@@ -20,7 +38,7 @@
         </div>
     </div>
 
-    <!-- Библиотеки для экспорта -->
+    <!-- Подключение библиотек для экспорта -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
