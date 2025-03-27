@@ -17,20 +17,24 @@ function renderProjects() {
             <h3>${project.name}</h3>
             <p>${project.description || 'Нет описания'}</p>
             <p>Даты: ${project.startDate} - ${project.endDate}</p>
-            <button onclick="viewProject('${project.id}')">Просмотреть риски</button>
+            <div class="project-actions">
+                <button class="view-btn" onclick="viewProject('${project.id}')">Риски</button>
+                <button class="edit-btn" onclick="editProject('${project.id}')">Редактировать</button>
+                <button class="delete-btn" onclick="deleteProject('${project.id}')">Удалить</button>
+            </div>
         `;
         container.appendChild(card);
     });
 }
 
 function openModal(type, projectId) {
-    currentProject = projectId;
+    currentProject = projectId || null;
     const modal = document.getElementById('modal');
     const modalTitle = document.getElementById('modal-title');
     const modalBody = document.getElementById('modal-body');
     
     if(type === 'project') {
-        modalTitle.textContent = 'Добавить проект';
+        modalTitle.textContent = currentProject ? 'Редактировать проект' : 'Добавить проект';
         modalBody.innerHTML = `
             <input type="text" id="projectName" placeholder="Название проекта" required>
             <input type="text" id="projectDesc" placeholder="Описание">
@@ -38,6 +42,14 @@ function openModal(type, projectId) {
             <input type="date" id="endDate">
             <button onclick="addProject()">Сохранить</button>
         `;
+        
+        if(currentProject) {
+            const project = projects.find(p => p.id === currentProject);
+            document.getElementById('projectName').value = project.name;
+            document.getElementById('projectDesc').value = project.description;
+            document.getElementById('startDate').value = project.startDate;
+            document.getElementById('endDate').value = project.endDate;
+        }
     } else if(type === 'risk') {
         modalTitle.textContent = 'Добавить риск';
         modalBody.innerHTML = `
@@ -56,17 +68,42 @@ function closeModal() {
 }
 
 function addProject() {
-    const project = {
-        id: Date.now().toString(),
+    const projectData = {
         name: document.getElementById('projectName').value,
         description: document.getElementById('projectDesc').value,
         startDate: document.getElementById('startDate').value,
-        endDate: document.getElementById('endDate').value,
-        risks: []
+        endDate: document.getElementById('endDate').value
     };
-    projects.push(project);
+    
+    if(currentProject) {
+        const index = projects.findIndex(p => p.id === currentProject);
+        projects[index] = {
+            ...projects[index],
+            ...projectData
+        };
+    } else {
+        const newProject = {
+            id: Date.now().toString(),
+            ...projectData,
+            risks: []
+        };
+        projects.push(newProject);
+    }
+    
     saveData();
     closeModal();
+    currentProject = null;
+}
+
+function deleteProject(projectId) {
+    if(confirm('Удалить проект и все связанные риски?')) {
+        projects = projects.filter(p => p.id !== projectId);
+        saveData();
+    }
+}
+
+function editProject(projectId) {
+    openModal('project', projectId);
 }
 
 function viewProject(projectId) {
@@ -83,6 +120,7 @@ function viewProject(projectId) {
                     <th>Вероятность</th>
                     <th>Воздействие</th>
                     <th>Оценка</th>
+                    <th>Действия</th>
                 </tr>
             </thead>
             <tbody>
@@ -92,6 +130,10 @@ function viewProject(projectId) {
                         <td>${risk.probability}%</td>
                         <td>${risk.impact}</td>
                         <td><span class="risk-level ${getRiskLevel(risk.score)}">${risk.score}</span></td>
+                        <td>
+                            <button onclick="editRisk('${projectId}', '${risk.id}')">Ред.</button>
+                            <button onclick="deleteRisk('${projectId}', '${risk.id}')">Уд.</button>
+                        </td>
                     </tr>
                 `).join('')}
             </tbody>
@@ -106,6 +148,7 @@ function viewProject(projectId) {
 function addRisk(projectId) {
     const project = projects.find(p => p.id === projectId);
     const risk = {
+        id: Date.now().toString(),
         name: document.getElementById('riskName').value,
         probability: parseInt(document.getElementById('probability').value),
         impact: parseInt(document.getElementById('impact').value),
@@ -116,6 +159,36 @@ function addRisk(projectId) {
     saveData();
     closeModal();
     viewProject(projectId);
+}
+
+function deleteRisk(projectId, riskId) {
+    if(confirm('Удалить риск?')) {
+        const project = projects.find(p => p.id === projectId);
+        project.risks = project.risks.filter(r => r.id !== riskId);
+        saveData();
+        viewProject(projectId);
+    }
+}
+
+function editRisk(projectId, riskId) {
+    const project = projects.find(p => p.id === projectId);
+    const risk = project.risks.find(r => r.id === riskId);
+    
+    openModal('risk', projectId);
+    document.getElementById('riskName').value = risk.name;
+    document.getElementById('probability').value = risk.probability;
+    document.getElementById('impact').value = risk.impact;
+    
+    // Переопределяем сохранение для редактирования
+    document.querySelector('#modal button').onclick = () => {
+        risk.name = document.getElementById('riskName').value;
+        risk.probability = parseInt(document.getElementById('probability').value);
+        risk.impact = parseInt(document.getElementById('impact').value);
+        risk.score = risk.probability * risk.impact;
+        saveData();
+        closeModal();
+        viewProject(projectId);
+    };
 }
 
 function getRiskLevel(score) {
