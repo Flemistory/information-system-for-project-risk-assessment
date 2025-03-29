@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Система оценки рисков</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     <!-- Боковая панель -->
@@ -13,10 +14,10 @@
             <h3>Меню</h3>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="#" onclick="navigateToMainPage()">Главная</a></li>
-            <li><a href="#" onclick="openModal('project')">Добавить проект</a></li>
-            <li><a href="#" onclick="navigateToAdminPanel()">Админ-панель</a></li>
-            <li><a href="#" onclick="logout()">Выход</a></li>
+            <li><a href="#" onclick="navigateToMainPage()"><span class="material-icons">dashboard</span>Главная</a></li>
+            <li><a href="#" onclick="openModal('project')"><span class="material-icons">add</span>Добавить проект</a></li>
+            <li><a href="#" onclick="navigateToAdminPanel()"><span class="material-icons">admin_panel_settings</span>Админ-панель</a></li>
+            <li><a href="#" onclick="logout()"><span class="material-icons">exit_to_app</span>Выход</a></li>
         </ul>
     </div>
 
@@ -68,7 +69,7 @@
                 <select id="new-role" name="new-role" required>
                     <option value="user">Пользователь</option>
                     <option value="admin">Администратор</option>
-                </select><br>
+                </Select><br>
                 <button type="button" onclick="addUser()">Сохранить</button>
             </form>
         </div>
