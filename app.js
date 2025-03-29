@@ -2,6 +2,7 @@
 let users = JSON.parse(localStorage.getItem('users')) || [];
 let currentUser = null;
 let projects = [];
+let currentProject = null;
 
 // Инициализация системы
 window.onload = function () {
@@ -383,6 +384,17 @@ function openModal(type, projectId) {
 // Закрыть модальное окно
 function closeModal() {
     document.getElementById('modal').style.display = 'none';
+}
+
+// Навигация на главную страницу
+function navigateToMainPage() {
+    if (!currentUser) {
+        openAuthModal();
+        return;
+    }
+
+    loadUserData();
+    document.getElementById('main-page').style.display = 'block';
 }
 
 // Выход из системы

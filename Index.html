@@ -7,34 +7,47 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Модальное окно авторизации/регистрации -->
-    <div id="auth-modal" class="modal">
-        <div class="modal-content">
-            <span onclick="closeAuthModal()" class="close">&times;</span>
-            <h2 id="auth-title">Авторизация</h2>
-            <div id="auth-body">
-                <input type="text" id="auth-login" placeholder="Логин" required>
-                <input type="password" id="auth-password" placeholder="Пароль" required>
-                <button id="auth-button" onclick="handleAuth()">Войти</button>
-                <button id="switch-auth" onclick="toggleAuthMode()">Регистрация</button>
-            </div>
+    <!-- Боковая панель -->
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <h3>Меню</h3>
         </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" onclick="navigateToMainPage()">Главная</a></li>
+            <li><a href="#" onclick="openModal('project')">Добавить проект</a></li>
+            <li><a href="#" onclick="logout()">Выход</a></li>
+        </ul>
     </div>
 
-    <!-- Главная страница -->
-    <div id="main-page" style="display: none;">
-    <h1>Управление проектами</h1>
-    <button onclick="openModal('project')">Добавить проект</button>
-    <button onclick="logout()">Выход</button> <!-- Кнопка выхода -->
-    <div id="projects"></div>
-</div>
+    <!-- Основное содержимое -->
+    <div id="content">
+        <!-- Модальное окно авторизации/регистрации -->
+        <div id="auth-modal" class="modal">
+            <div class="modal-content">
+                <span onclick="closeAuthModal()" class="close">&times;</span>
+                <h2 id="auth-title">Авторизация</h2>
+                <div id="auth-body">
+                    <input type="text" id="auth-login" placeholder="Логин" required>
+                    <input type="password" id="auth-password" placeholder="Пароль" required>
+                    <button id="auth-button" onclick="handleAuth()">Войти</button>
+                    <button id="switch-auth" onclick="toggleAuthMode()">Регистрация</button>
+                </div>
+            </div>
+        </div>
 
-    <!-- Модальные окна -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span onclick="closeModal()" class="close">&times;</span>
-            <h2 id="modal-title"></h2>
-            <div id="modal-body"></div>
+        <!-- Главная страница -->
+        <div id="main-page" style="display: none;">
+            <h1>Управление проектами</h1>
+            <div id="projects"></div>
+        </div>
+
+        <!-- Модальные окна -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span onclick="closeModal()" class="close">&times;</span>
+                <h2 id="modal-title"></h2>
+                <div id="modal-body"></div>
+            </div>
         </div>
     </div>
 
