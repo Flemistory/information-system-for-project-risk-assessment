@@ -15,6 +15,7 @@
         <ul class="sidebar-menu">
             <li><a href="#" onclick="navigateToMainPage()">Главная</a></li>
             <li><a href="#" onclick="openModal('project')">Добавить проект</a></li>
+            <li><a href="#" onclick="navigateToAdminPanel()">Админ-панель</a></li>
             <li><a href="#" onclick="logout()">Выход</a></li>
         </ul>
     </div>
@@ -39,6 +40,37 @@
         <div id="main-page" style="display: none;">
             <h1>Управление проектами</h1>
             <div id="projects"></div>
+        </div>
+
+        <!-- Админ-панель -->
+        <div id="admin-panel" style="display: none;">
+            <h2>Админ-панель</h2>
+            <h3>Управление пользователями</h3>
+            <table border="1" id="users-table">
+                <thead>
+                    <tr>
+                        <th>Логин</th>
+                        <th>Роль</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="users-tbody">
+                    <!-- Заполнится динамически -->
+                </tbody>
+            </table>
+            <h3>Добавить нового пользователя</h3>
+            <form id="add-user-form">
+                <label for="new-login">Логин:</label><br>
+                <input type="text" id="new-login" name="new-login" required><br>
+                <label for="new-password">Пароль:</label><br>
+                <input type="password" id="new-password" name="new-password" required><br>
+                <label for="new-role">Роль:</label><br>
+                <select id="new-role" name="new-role" required>
+                    <option value="user">Пользователь</option>
+                    <option value="admin">Администратор</option>
+                </select><br>
+                <button type="button" onclick="addUser()">Сохранить</button>
+            </form>
         </div>
 
         <!-- Модальные окна -->

@@ -244,3 +244,47 @@ input, select {
         margin-left: 220px;
     }
 }
+
+/* Стили для админ-панели */
+#admin-panel form {
+    margin-top: 20px;
+}
+
+#admin-panel label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#admin-panel input, #admin-panel select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#admin-panel button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#admin-panel button[type="button"] {
+    background-color: #28a745;
+    color: white;
+}
+
+#admin-panel button[type="button"]:hover {
+    opacity: 0.9;
+}
+
+#admin-panel button.delete-user {
+    background-color: #ff4444;
+    color: white;
+}
+
+#admin-panel button.delete-user:hover {
+    opacity: 0.9;
+}

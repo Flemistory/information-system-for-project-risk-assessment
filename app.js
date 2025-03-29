@@ -60,7 +60,7 @@ function handleAuth() {
             return;
         }
 
-        users.push({ login, password });
+        users.push({ login, password, role: 'user' });
         localStorage.setItem('users', JSON.stringify(users));
         alert('Регистрация успешна!');
         toggleAuthMode();
@@ -74,8 +74,11 @@ function handleAuth() {
         currentUser = user;
         localStorage.setItem('loggedInUser', JSON.stringify(currentUser));
         closeAuthModal();
-        loadUserData();
-        document.getElementById('main-page').style.display = 'block';
+        if (currentUser.role === 'admin') {
+            navigateToAdminPanel();
+        } else {
+            navigateToMainPage();
+        }
     }
 
     document.getElementById('auth-login').value = '';
@@ -395,6 +398,89 @@ function navigateToMainPage() {
 
     loadUserData();
     document.getElementById('main-page').style.display = 'block';
+    document.getElementById('admin-panel').style.display = 'none';
+}
+
+// Навигация на админ-панель
+function navigateToAdminPanel() {
+    if (!currentUser || currentUser.role !== 'admin') {
+        alert('Доступ запрещен!');
+        return;
+    }
+
+    loadUsers();
+    document.getElementById('main-page').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+}
+
+// Загрузка пользователей
+function loadUsers() {
+    if (!currentUser || currentUser.role !== 'admin') return;
+
+    const tbody = document.getElementById('users-tbody');
+    tbody.innerHTML = '';
+
+    users.forEach(user => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${user.login}</td>
+            <td>${user.role}</td>
+            <td>
+                <button onclick="editUserRole('${user.login}')">Изменить роль</button>
+                <button class="delete-user" onclick="deleteUser('${user.login}')">Удалить</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Изменение роли пользователя
+function editUserRole(login) {
+    const user = users.find(u => u.login === login);
+    if (!user) return;
+
+    const newRole = prompt(`Текущая роль: ${user.role}\nВведите новую роль (user/admin):`).trim();
+    if (newRole !== 'user' && newRole !== 'admin') {
+        alert('Неверная роль! Допустимые значения: user, admin.');
+        return;
+    }
+
+    user.role = newRole;
+    localStorage.setItem('users', JSON.stringify(users));
+    loadUsers();
+}
+
+// Удаление пользователя
+function deleteUser(login) {
+    if (!confirm('Удалить пользователя?')) return;
+
+    users = users.filter(u => u.login !== login);
+    localStorage.setItem('users', JSON.stringify(users));
+    loadUsers();
+}
+
+// Добавление нового пользователя
+function addUser() {
+    const login = document.getElementById('new-login').value.trim();
+    const password = document.getElementById('new-password').value.trim();
+    const role = document.getElementById('new-role').value.trim();
+
+    if (!login || !password || !role) {
+        alert('Заполните все обязательные поля!');
+        return;
+    }
+
+    if (users.find(user => user.login === login)) {
+        alert('Пользователь с таким логином уже существует!');
+        return;
+    }
+
+    users.push({ login, password, role });
+    localStorage.setItem('users', JSON.stringify(users));
+    loadUsers();
+    document.getElementById('new-login').value = '';
+    document.getElementById('new-password').value = '';
+    document.getElementById('new-role').value = 'user';
 }
 
 // Выход из системы
@@ -404,5 +490,6 @@ function logout() {
     currentUser = null;
     localStorage.removeItem('loggedInUser'); // Удаляем данные текущего пользователя
     document.getElementById('main-page').style.display = 'none'; // Скрываем главную страницу
+    document.getElementById('admin-panel').style.display = 'none'; // Скрываем админ-панель
     openAuthModal(); // Открываем модальное окно авторизации
 }
