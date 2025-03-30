@@ -6,6 +6,9 @@ let currentProject = null;
 
 // Инициализация системы
 window.onload = function () {
+    // Проверка наличия администратора
+    checkAndCreateAdmin();
+
     const loggedInUser = localStorage.getItem('loggedInUser');
     if (loggedInUser) {
         currentUser = JSON.parse(loggedInUser);
@@ -15,6 +18,20 @@ window.onload = function () {
         openAuthModal(); // Открываем модальное окно авторизации
     }
 };
+
+// Проверка наличия администратора и создание, если отсутствует
+function checkAndCreateAdmin() {
+    const adminExists = users.some(user => user.role === 'admin');
+    if (!adminExists) {
+        const adminUser = {
+            login: 'admin',
+            password: 'admin', // Рекомендуется использовать более безопасный пароль в продакшене
+            role: 'admin'
+        };
+        users.push(adminUser);
+        localStorage.setItem('users', JSON.stringify(users));
+    }
+}
 
 // Открыть модальное окно авторизации
 function openAuthModal() {
@@ -31,7 +48,6 @@ function toggleAuthMode() {
     const title = document.getElementById('auth-title');
     const button = document.getElementById('auth-button');
     const switchButton = document.getElementById('switch-auth');
-
     if (title.textContent === 'Авторизация') {
         title.textContent = 'Регистрация';
         button.textContent = 'Зарегистрироваться';
@@ -48,18 +64,15 @@ function handleAuth() {
     const login = document.getElementById('auth-login').value.trim();
     const password = document.getElementById('auth-password').value.trim();
     const isRegistration = document.getElementById('auth-title').textContent === 'Регистрация';
-
     if (isRegistration) {
         if (!login || !password) {
             alert('Введите логин и пароль!');
             return;
         }
-
         if (users.find(user => user.login === login)) {
             alert('Пользователь с таким логином уже существует!');
             return;
         }
-
         users.push({ login, password, role: 'user' });
         localStorage.setItem('users', JSON.stringify(users));
         alert('Регистрация успешна!');
@@ -70,7 +83,6 @@ function handleAuth() {
             alert('Неверный логин или пароль!');
             return;
         }
-
         currentUser = user;
         localStorage.setItem('loggedInUser', JSON.stringify(currentUser));
         closeAuthModal();
@@ -80,7 +92,6 @@ function handleAuth() {
             navigateToMainPage();
         }
     }
-
     document.getElementById('auth-login').value = '';
     document.getElementById('auth-password').value = '';
 }
@@ -102,15 +113,12 @@ function saveData() {
 // Отрисовка проектов
 function renderProjects() {
     if (!currentUser) return;
-
     const container = document.getElementById('projects');
     container.innerHTML = '';
-
     if (projects.length === 0) {
         container.innerHTML = '<p>Нет проектов. Добавьте новый проект.</p>';
         return;
     }
-
     projects.forEach(project => {
         const card = document.createElement('div');
         card.className = 'project-card';
@@ -131,7 +139,6 @@ function renderProjects() {
 // Добавление проекта
 function addProject() {
     if (!currentUser) return;
-
     const projectData = {
         id: Date.now().toString(),
         name: document.getElementById('projectName').value,
@@ -140,12 +147,10 @@ function addProject() {
         endDate: document.getElementById('endDate').value,
         risks: []
     };
-
     if (!projectData.name || !projectData.startDate || !projectData.endDate) {
         alert('Заполните все обязательные поля!');
         return;
     }
-
     projects.push(projectData);
     saveData();
     closeModal();
@@ -154,9 +159,7 @@ function addProject() {
 // Удаление проекта
 function deleteProject(projectId) {
     if (!currentUser) return;
-
     if (!confirm('Удалить проект и все связанные риски?')) return;
-
     projects = projects.filter(p => p.id !== projectId);
     saveData();
 }
@@ -164,16 +167,13 @@ function deleteProject(projectId) {
 // Редактирование проекта
 function editProject(projectId) {
     if (!currentUser) return;
-
     const project = projects.find(p => p.id === projectId);
     if (!project) return;
-
     openModal('project', projectId);
     document.getElementById('projectName').value = project.name;
     document.getElementById('projectDesc').value = project.description;
     document.getElementById('startDate').value = project.startDate;
     document.getElementById('endDate').value = project.endDate;
-
     document.querySelector('#modal button').onclick = () => {
         project.name = document.getElementById('projectName').value;
         project.description = document.getElementById('projectDesc').value;
@@ -187,10 +187,8 @@ function editProject(projectId) {
 // Просмотр проекта
 function viewProject(projectId) {
     if (!currentUser) return;
-
     const project = projects.find(p => p.id === projectId);
     currentProject = projectId;
-
     const modalBody = `
         <h3>${project.name}</h3>
         <button onclick="openModal('risk', '${projectId}')">Добавить риск</button>
@@ -224,7 +222,6 @@ function viewProject(projectId) {
             </tbody>
         </table>
     `;
-
     openModal('risk-view');
     document.getElementById('modal-title').textContent = project.name;
     document.getElementById('modal-body').innerHTML = modalBody;
@@ -233,10 +230,8 @@ function viewProject(projectId) {
 // Добавление риска
 function addRisk(projectId) {
     if (!currentUser) return;
-
     const project = projects.find(p => p.id === projectId);
     if (!project) return;
-
     const risk = {
         id: Date.now().toString(),
         name: document.getElementById('riskName').value,
@@ -244,12 +239,10 @@ function addRisk(projectId) {
         impact: parseInt(document.getElementById('impact').value),
         score: 0
     };
-
     if (!risk.name || isNaN(risk.probability) || isNaN(risk.impact)) {
         alert('Заполните все обязательные поля!');
         return;
     }
-
     risk.score = risk.probability * risk.impact;
     project.risks.push(risk);
     saveData();
@@ -260,12 +253,9 @@ function addRisk(projectId) {
 // Удаление риска
 function deleteRisk(projectId, riskId) {
     if (!currentUser) return;
-
     const project = projects.find(p => p.id === projectId);
     if (!project) return;
-
     if (!confirm('Удалить риск?')) return;
-
     project.risks = project.risks.filter(r => r.id !== riskId);
     saveData();
     viewProject(projectId);
@@ -274,18 +264,14 @@ function deleteRisk(projectId, riskId) {
 // Редактирование риска
 function editRisk(projectId, riskId) {
     if (!currentUser) return;
-
     const project = projects.find(p => p.id === projectId);
     if (!project) return;
-
     const risk = project.risks.find(r => r.id === riskId);
     if (!risk) return;
-
     openModal('risk', projectId);
     document.getElementById('riskName').value = risk.name;
     document.getElementById('probability').value = risk.probability;
     document.getElementById('impact').value = risk.impact;
-
     document.querySelector('#modal button').onclick = () => {
         risk.name = document.getElementById('riskName').value;
         risk.probability = parseInt(document.getElementById('probability').value);
@@ -300,17 +286,14 @@ function editRisk(projectId, riskId) {
 // Экспорт в Excel
 function exportToExcel(projectId) {
     if (!currentUser) return;
-
     const project = projects.find(p => p.id === projectId);
     if (!project) return;
-
     const risks = project.risks.map(risk => ({
         'Название риска': risk.name,
         'Вероятность (%)': risk.probability,
         'Воздействие': risk.impact,
         'Оценка риска': risk.score
     }));
-
     const ws = XLSX.utils.json_to_sheet(risks);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Риски');
@@ -320,10 +303,8 @@ function exportToExcel(projectId) {
 // Экспорт в PDF
 function exportToPDF(projectId) {
     if (!currentUser) return;
-
     const project = projects.find(p => p.id === projectId);
     if (!project) return;
-
     const table = document.getElementById(`project-table-${projectId}`);
     html2canvas(table).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
@@ -332,10 +313,8 @@ function exportToPDF(projectId) {
             unit: 'mm',
             format: 'a4'
         });
-
         const imgWidth = pdf.internal.pageSize.getWidth();
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
         pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
         pdf.save(`${project.name}.pdf`);
     });
@@ -353,7 +332,6 @@ function openModal(type, projectId) {
     const modal = document.getElementById('modal');
     const modalTitle = document.getElementById('modal-title');
     const modalBody = document.getElementById('modal-body');
-
     if (type === 'project') {
         modalTitle.textContent = projectId ? 'Редактировать проект' : 'Добавить проект';
         modalBody.innerHTML = `
@@ -363,7 +341,6 @@ function openModal(type, projectId) {
             <input type="date" id="endDate" required>
             <button onclick="addProject()">Сохранить</button>
         `;
-
         if (projectId) {
             const project = projects.find(p => p.id === projectId);
             document.getElementById('projectName').value = project.name;
@@ -380,7 +357,6 @@ function openModal(type, projectId) {
             <button onclick="addRisk('${projectId}')">Сохранить</button>
         `;
     }
-
     modal.style.display = 'block';
 }
 
@@ -395,7 +371,6 @@ function navigateToMainPage() {
         openAuthModal();
         return;
     }
-
     loadUserData();
     document.getElementById('main-page').style.display = 'block';
     document.getElementById('admin-panel').style.display = 'none';
@@ -407,7 +382,6 @@ function navigateToAdminPanel() {
         alert('Доступ запрещен!');
         return;
     }
-
     loadUsers();
     document.getElementById('main-page').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'block';
@@ -416,10 +390,8 @@ function navigateToAdminPanel() {
 // Загрузка пользователей
 function loadUsers() {
     if (!currentUser || currentUser.role !== 'admin') return;
-
     const tbody = document.getElementById('users-tbody');
     tbody.innerHTML = '';
-
     users.forEach(user => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -438,13 +410,12 @@ function loadUsers() {
 function editUserRole(login) {
     const user = users.find(u => u.login === login);
     if (!user) return;
-
-    const newRole = prompt(`Текущая роль: ${user.role}\nВведите новую роль (user/admin):`).trim();
+    const newRole = prompt(`Текущая роль: ${user.role}
+Введите новую роль (user/admin):`).trim();
     if (newRole !== 'user' && newRole !== 'admin') {
         alert('Неверная роль! Допустимые значения: user, admin.');
         return;
     }
-
     user.role = newRole;
     localStorage.setItem('users', JSON.stringify(users));
     loadUsers();
@@ -453,7 +424,6 @@ function editUserRole(login) {
 // Удаление пользователя
 function deleteUser(login) {
     if (!confirm('Удалить пользователя?')) return;
-
     users = users.filter(u => u.login !== login);
     localStorage.setItem('users', JSON.stringify(users));
     loadUsers();
@@ -464,17 +434,14 @@ function addUser() {
     const login = document.getElementById('new-login').value.trim();
     const password = document.getElementById('new-password').value.trim();
     const role = document.getElementById('new-role').value.trim();
-
     if (!login || !password || !role) {
         alert('Заполните все обязательные поля!');
         return;
     }
-
     if (users.find(user => user.login === login)) {
         alert('Пользователь с таким логином уже существует!');
         return;
     }
-
     users.push({ login, password, role });
     localStorage.setItem('users', JSON.stringify(users));
     loadUsers();
@@ -486,10 +453,25 @@ function addUser() {
 // Выход из системы
 function logout() {
     if (!confirm('Вы уверены, что хотите выйти?')) return;
-
     currentUser = null;
     localStorage.removeItem('loggedInUser'); // Удаляем данные текущего пользователя
     document.getElementById('main-page').style.display = 'none'; // Скрываем главную страницу
     document.getElementById('admin-panel').style.display = 'none'; // Скрываем админ-панель
     openAuthModal(); // Открываем модальное окно авторизации
+}
+
+// Переключение боковой панели
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const content = document.getElementById('content');
+
+    if (sidebar.classList.contains('sidebar-closed')) {
+        sidebar.classList.remove('sidebar-closed');
+        sidebar.classList.add('sidebar-open');
+        content.classList.remove('content-shifted');
+    } else {
+        sidebar.classList.remove('sidebar-open');
+        sidebar.classList.add('sidebar-closed');
+        content.classList.add('content-shifted');
+    }
 }

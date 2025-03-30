@@ -9,22 +9,27 @@
 </head>
 <body>
     <!-- Боковая панель -->
-    <div id="sidebar">
-        <div class="sidebar-header">
+    <aside id="sidebar" class="sidebar-open">
+        <header class="sidebar-header">
             <h3>Меню</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="#" onclick="navigateToMainPage()"><span class="material-icons">dashboard</span>Главная</a></li>
-            <li><a href="#" onclick="openModal('project')"><span class="material-icons">add</span>Добавить проект</a></li>
-            <li><a href="#" onclick="navigateToAdminPanel()"><span class="material-icons">admin_panel_settings</span>Админ-панель</a></li>
-            <li><a href="#" onclick="logout()"><span class="material-icons">exit_to_app</span>Выход</a></li>
-        </ul>
-    </div>
+            <button id="toggle-sidebar" class="toggle-btn" onclick="toggleSidebar()">
+                <span class="material-icons">menu</span>
+            </button>
+        </header>
+        <nav class="sidebar-menu">
+            <ul>
+                <li><a href="#" onclick="navigateToMainPage()"><span class="material-icons">dashboard</span>Главная</a></li>
+                <li><a href="#" onclick="openModal('project')"><span class="material-icons">add</span>Добавить проект</a></li>
+                <li><a href="#" onclick="navigateToAdminPanel()"><span class="material-icons">admin_panel_settings</span>Админ-панель</a></li>
+                <li><a href="#" onclick="logout()"><span class="material-icons">exit_to_app</span>Выход</a></li>
+            </ul>
+        </nav>
+    </aside>
 
     <!-- Основное содержимое -->
-    <div id="content">
+    <main id="content">
         <!-- Модальное окно авторизации/регистрации -->
-        <div id="auth-modal" class="modal">
+        <div id="auth-modal" class="modal hidden">
             <div class="modal-content">
                 <span onclick="closeAuthModal()" class="close">&times;</span>
                 <h2 id="auth-title">Авторизация</h2>
@@ -38,13 +43,13 @@
         </div>
 
         <!-- Главная страница -->
-        <div id="main-page" style="display: none;">
+        <section id="main-page" style="display: none;">
             <h1>Управление проектами</h1>
             <div id="projects"></div>
-        </div>
+        </section>
 
         <!-- Админ-панель -->
-        <div id="admin-panel" style="display: none;">
+        <section id="admin-panel" style="display: none;">
             <h2>Админ-панель</h2>
             <h3>Управление пользователями</h3>
             <table border="1" id="users-table">
@@ -69,20 +74,20 @@
                 <select id="new-role" name="new-role" required>
                     <option value="user">Пользователь</option>
                     <option value="admin">Администратор</option>
-                </Select><br>
+                </select><br>
                 <button type="button" onclick="addUser()">Сохранить</button>
             </form>
-        </div>
+        </section>
 
         <!-- Модальные окна -->
-        <div id="modal" class="modal">
+        <div id="modal" class="modal hidden">
             <div class="modal-content">
                 <span onclick="closeModal()" class="close">&times;</span>
                 <h2 id="modal-title"></h2>
                 <div id="modal-body"></div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Подключение библиотек для экспорта -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
